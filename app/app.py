@@ -1,7 +1,7 @@
 import streamlit as st
 import torch
 import torchvision.transforms as transforms
-from torchvision.models import resnet18
+from torchvision.models import resnet50
 from PIL import Image
 
 # Page Config
@@ -32,11 +32,11 @@ ADAS_HAZARD_MAP = {
 # 2. Load Model Function
 @st.cache_resource
 def load_model():
-    model = resnet18()
+    model = resnet50()
     num_ftrs = model.fc.in_features
     model.fc = torch.nn.Linear(num_ftrs, 10)
-    # Load fine-tuned weights
-    model.load_state_dict(torch.load("cifar10_resnet18_adas.pth", map_location=torch.device('cpu')))
+    # Load fine-tuned ResNet-50 weights
+    model.load_state_dict(torch.load("resnet50_cifar10.pth", map_location=torch.device('cpu')))
     model.eval()
     return model
 
