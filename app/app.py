@@ -7,14 +7,14 @@ from PIL import Image
 # Page Config
 st.set_page_config(page_title="ADAS Road Hazard Detector", page_icon="🚗", layout="wide")
 
-st.title("🚗 ADAS Hazard & Obstacle Classification System")[cite: 1]
-st.write("Upload a dashcam image to evaluate real-time road hazard alerts.")[cite: 1]
+st.title("🚗 ADAS Hazard & Obstacle Classification System")
+st.write("Upload a dashcam image to evaluate real-time road hazard alerts.")
 
 # 1. Define Class Names and Hazard Logic
 CIFAR10_CLASSES = (
     'plane', 'car', 'bird', 'cat', 'deer',
     'dog', 'frog', 'horse', 'ship', 'truck'
-)[cite: 1]
+)
 
 ADAS_HAZARD_MAP = {
     'plane': ('Low-Risk / Contextual Asset', 'info'),
@@ -27,7 +27,7 @@ ADAS_HAZARD_MAP = {
     'horse': ('Living Threat (Emergency Warning)', 'error'),
     'ship': ('Low-Risk / Contextual Asset', 'info'),
     'truck': ('Vehicle Hazard (Proximity Tracking)', 'warning')
-}[cite: 1]
+}
 
 # 2. Load Model Function
 @st.cache_resource
@@ -52,7 +52,7 @@ transform = transforms.Compose([
 ])
 
 # 4. Upload & Classification UI
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])[cite: 1]
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
@@ -60,7 +60,7 @@ if uploaded_file is not None:
     col1, col2 = st.columns(2)
     
     with col1:
-        st.image(image, caption="Uploaded Image", use_container_width=True)
+        st.image(image, caption="Uploaded Image", width="stretch")
         
     with col2:
         st.subheader("Inference & Hazard Result")
