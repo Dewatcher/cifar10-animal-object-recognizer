@@ -7,14 +7,14 @@ from PIL import Image
 # Page Config
 st.set_page_config(page_title="ADAS Road Hazard Detector", page_icon="🚗", layout="wide")
 
-st.title("🚗 ADAS Hazard & Obstacle Classification System")
-st.write("Upload a dashcam image to evaluate real-time road hazard alerts.")
+st.title("🚗 ADAS Hazard & Obstacle Classification System")[cite: 1]
+st.write("Upload a dashcam image to evaluate real-time road hazard alerts.")[cite: 1]
 
 # 1. Define Class Names and Hazard Logic
 CIFAR10_CLASSES = (
     'plane', 'car', 'bird', 'cat', 'deer',
     'dog', 'frog', 'horse', 'ship', 'truck'
-)
+)[cite: 1]
 
 ADAS_HAZARD_MAP = {
     'plane': ('Low-Risk / Contextual Asset', 'info'),
@@ -27,7 +27,7 @@ ADAS_HAZARD_MAP = {
     'horse': ('Living Threat (Emergency Warning)', 'error'),
     'ship': ('Low-Risk / Contextual Asset', 'info'),
     'truck': ('Vehicle Hazard (Proximity Tracking)', 'warning')
-}
+}[cite: 1]
 
 # 2. Load Model Function
 @st.cache_resource
@@ -42,15 +42,17 @@ def load_model():
 
 model = load_model()
 
-# 3. Image Preprocessing Transformation
+# 3. Image Preprocessing Transformation (Center-Crop Fix for Wide-Angle Images)
 transform = transforms.Compose([
-    transforms.Resize((32, 32)),
+    transforms.Resize(256),          # Preserve aspect ratio while resizing shorter edge
+    transforms.CenterCrop(224),       # Crop subject region to prevent background distortion
+    transforms.Resize((32, 32)),      # Downsample cropped region to CIFAR-10 dimensions
     transforms.ToTensor(),
     transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
 ])
 
 # 4. Upload & Classification UI
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])[cite: 1]
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
