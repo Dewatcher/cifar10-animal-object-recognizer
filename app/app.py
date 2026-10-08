@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import torch
 import torchvision.transforms as transforms
@@ -30,13 +31,13 @@ ADAS_HAZARD_MAP = {
 }
 
 # 2. Load Model Function
+MODEL_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resnet50_cifar10.pth")
+
 @st.cache_resource
 def load_model():
-    model = resnet50()
-    num_ftrs = model.fc.in_features
-    model.fc = torch.nn.Linear(num_ftrs, 10)
-    # Load fine-tuned ResNet-50 weights
-    model.load_state_dict(torch.load("resnet50_cifar10.pth", map_location=torch.device('cpu')))
+    model = resnet50(weights=None)
+    model.fc = torch.nn.Linear(model.fc.in_features, 10)
+    model.load_state_dict(torch.load(MODEL_PATH, map_location=torch.device('cpu')))
     model.eval()
     return model
 
@@ -44,11 +45,10 @@ model = load_model()
 
 # 3. Image Preprocessing Transformation (Center-Crop Fix for Wide-Angle Images)
 transform = transforms.Compose([
-    transforms.Resize(256),          # Preserve aspect ratio while resizing shorter edge
-    transforms.CenterCrop(224),       # Crop subject region to prevent background distortion
-    transforms.Resize((32, 32)),      # Downsample cropped region to CIFAR-10 dimensions
+    transforms.Resize((224, 224)),
     transforms.ToTensor(),
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+    transforms.Normalize([0.485, 0.456, 0.406],
+                         [0.229, 0.224, 0.225])
 ])
 
 # 4. Upload & Classification UI
