@@ -52,36 +52,48 @@ transform = transforms.Compose([
 ])
 
 # 4. Upload & Classification UI
+# 4. Upload & Classification UI
+CONF_THRESHOLD = st.sidebar.slider("Minimum confidence to accept a class (%)", 50, 99, 85) / 100
+MARGIN_THRESHOLD = 0.30  # top-1 must beat top-2 by at least this much
+
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
-    
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.image(image, caption="Uploaded Image", width="stretch")
-        
+
     with col2:
         st.subheader("Inference & Hazard Result")
-        
-        # Preprocess and Predict
+
         img_tensor = transform(image).unsqueeze(0)
         with torch.no_grad():
             outputs = model(img_tensor)
-            probabilities = torch.nn.functional.softmax(outputs, dim=1)
-            confidence, predicted = torch.max(probabilities, 1)
-            
-        pred_class = CIFAR10_CLASSES[predicted.item()]
-        conf_percentage = confidence.item() * 100
-        status_text, alert_type = ADAS_HAZARD_MAP[pred_class]
-        
-        st.metric("Predicted Target", pred_class.upper(), f"{conf_percentage:.2f}% Confidence")
-        
-        # Display Color-Coded Hazard Status
-        if alert_type == 'error':
-            st.error(f"🚨 **RED ALERT:** {status_text}")
-        elif alert_type == 'warning':
-            st.warning(f"⚠️ **YELLOW ALERT:** {status_text}")
+            probabilities = torch.nn.functional.softmax(outputs, dim=1)[0]
+
+        top_probs, top_idx = torch.topk(probabilities, 3)
+        confidence = top_probs[0].item()
+        margin = (top_probs[0] - top_probs[1]).item()
+        pred_class = CIFAR10_CLASSES[top_idx[0].item()]
+
+        is_unknown = confidence < CONF_THRESHOLD or margin < MARGIN_THRESHOLD
+
+        if is_unknown:
+            st.metric("Predicted Target", "UNKNOWN", f"Best guess {pred_class} at {confidence*100:.1f}% (rejected)")
+            st.warning("⚠️ **UNRECOGNIZED OBJECT:** Not one of the 10 trained classes. Treat as an unclassified obstacle (caution).")
         else:
-            st.info(f"ℹ️ **NOTICE:** {status_text}")
+            status_text, alert_type = ADAS_HAZARD_MAP[pred_class]
+            st.metric("Predicted Target", pred_class.upper(), f"{confidence*100:.2f}% Confidence")
+            if alert_type == 'error':
+                st.error(f"🚨 **RED ALERT:** {status_text}")
+            elif alert_type == 'warning':
+                st.warning(f"⚠️ **YELLOW ALERT:** {status_text}")
+            else:
+                st.info(f"ℹ️ **NOTICE:** {status_text}")
+
+        st.write("**Top 3 probabilities**")
+        for p, i in zip(top_probs, top_idx):
+            st.write(f"{CIFAR10_CLASSES[i.item()]}: {p.item()*100:.1f}%")
