@@ -45,6 +45,7 @@ model = load_model()
 
 # 3. Image Preprocessing Transformation (Center-Crop Fix for Wide-Angle Images)
 transform = transforms.Compose([
+    transforms.Resize((32, 32)),
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406],
