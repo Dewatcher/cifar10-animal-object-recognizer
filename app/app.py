@@ -10,6 +10,15 @@ st.set_page_config(page_title="ADAS Road Hazard Detector", page_icon="🚗", lay
 
 st.title("🚗 ADAS Hazard & Obstacle Classification System")
 st.write("Upload a dashcam image to evaluate real-time road hazard alerts.")
+st.caption("This model recognises only 10 classes: plane, car, bird, cat, deer, dog, frog, horse, ship, truck. People, streets and plants are outside its training. Results for those images can be wrong, even when the confidence looks high.")
+
+with st.expander("How to read the result"):
+    st.write("**RED alert:** a living thing was detected (bird, cat, deer, dog, frog, horse).")
+    st.write("**YELLOW alert:** a vehicle was detected (car, truck).")
+    st.write("**BLUE notice:** a low-risk object was detected (plane, ship).")
+    st.write("**UNKNOWN:** the model was not sure enough. Treat it as an unclassified obstacle and use caution.")
+    st.write("**Confidence slider (sidebar):** higher means stricter, so more images are rejected as UNKNOWN.")
+    st.write("**Limit:** the model can be confidently wrong on anything outside its 10 classes.")
 
 # 1. Define Class Names and Hazard Logic
 CIFAR10_CLASSES = (
