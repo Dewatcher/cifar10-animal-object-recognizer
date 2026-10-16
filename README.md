@@ -53,14 +53,6 @@ The notebook `notebooks/02_qa_evaluation.ipynb` reloads the saved model, evaluat
 Group 27, AI/ML Class A, TechCrush. Team lead: Sanni Oluwadarasimi Peter.
 Tutors and supervisors: Miracle Nwadiora and Lamzey Aribido.
 
-| Role | Team member |
-|---|---|
-| System architecture and integration | Sanni Oluwadarasimi Peter |
-| Data engineering and preprocessing | Daniel Ofukowoicho Odeh |
-| Machine learning and model training | Sanni Oluwadarasimi Peter, Daniel Ofukowoicho Odeh |
-| Frontend and deployment | Olayiwola Hameedah Oluwadamilola |
-| QA, edge case analysis and documentation | Nwokoro Chukwuemeka Pius, Gideon Olajide |
-
 ## Team workflow
 
 Branches, commits and file naming rules are in `CONTRIBUTING.md`.
